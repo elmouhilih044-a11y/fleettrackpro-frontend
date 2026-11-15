@@ -36,3 +36,19 @@ export async function request(path, { method = "GET", body, token } = {}) {
 export function login(email, password) {
   return request("/auth/login", { method: "POST", body: { email, password } })
 }
+
+export function getDrivers(token) {
+  return request("/users/drivers", { token })
+}
+
+export function createDriver(token, driver) {
+  return request("/users/drivers", { method: "POST", body: driver, token })
+}
+
+export function suspendDriver(token, id) {
+  return request(`/users/drivers/${id}/suspend`, { method: "PUT", token })
+}
+
+export function activateDriver(token, id) {
+  return request(`/users/drivers/${id}/activate`, { method: "PUT", token })
+}

@@ -1,16 +1,23 @@
 import { useState } from "react"
-import { login } from "./api"
+import { login, getDrivers, createDriver, suspendDriver, activateDriver } from "./api"
 import LoginForm from "./components/LoginForm"
 import AppShell from "./components/AppShell"
 import AdminLayout from "./components/AdminLayout"
 import DriverLayout from "./components/DriverLayout"
 import ProtectedView from "./components/ProtectedView"
+import UsersPage from "./components/UsersPage"
 
 function App() {
   const [session, setSession] = useState(null)
   const [view, setView] = useState("home")
   const [loginLoading, setLoginLoading] = useState(false)
   const [loginError, setLoginError] = useState("")
+
+  const [users, setUsers] = useState([])
+  const [usersLoading, setUsersLoading] = useState(false)
+  const [usersError, setUsersError] = useState("")
+  const [selectedUserId, setSelectedUserId] = useState(null)
+  const [formError, setFormError] = useState("")
 
   async function handleLogin(email, password) {
     setLoginLoading(true)
@@ -31,6 +38,68 @@ function App() {
   function handleLogout() {
     setSession(null)
     setView("home")
+    setUsers([])
+    setSelectedUserId(null)
+    setUsersError("")
+    setFormError("")
+  }
+
+  function handleApiError(error, showMessage) {
+    if (error.status === 401) {
+      handleLogout()
+      setLoginError("Session expirée. Veuillez vous reconnecter.")
+      return
+    }
+    if (error.status === 403) {
+      showMessage("Accès refusé.")
+      return
+    }
+    showMessage(error.message)
+  }
+
+  async function loadUsers() {
+    setUsersLoading(true)
+    setUsersError("")
+    try {
+      setUsers(await getDrivers(session.token))
+    } catch (error) {
+      handleApiError(error, setUsersError)
+    } finally {
+      setUsersLoading(false)
+    }
+  }
+
+  function handleNavigate(newView) {
+    setView(newView)
+    if (newView === "users" && session.user.role === "admin") {
+      loadUsers()
+    }
+  }
+
+  async function handleCreateUser(driver) {
+    setFormError("")
+    try {
+      await createDriver(session.token, driver)
+      await loadUsers()
+      return true
+    } catch (error) {
+      handleApiError(error, setFormError)
+      return false
+    }
+  }
+
+  async function handleToggleStatus(user) {
+    setUsersError("")
+    try {
+      if (user.status === "suspended") {
+        await activateDriver(session.token, user._id)
+      } else {
+        await suspendDriver(session.token, user._id)
+      }
+      await loadUsers()
+    } catch (error) {
+      handleApiError(error, setUsersError)
+    }
   }
 
   if (!session) {
@@ -41,8 +110,16 @@ function App() {
     if (view === "users") {
       return (
         <ProtectedView session={session} allowedRoles={["admin"]}>
-          <h2>Utilisateurs</h2>
-          <p>La liste arrive à l'étape E.</p>
+          <UsersPage
+            users={users}
+            loading={usersLoading}
+            error={usersError}
+            selectedId={selectedUserId}
+            onSelect={setSelectedUserId}
+            onToggleStatus={handleToggleStatus}
+            onCreate={handleCreateUser}
+            formError={formError}
+          />
         </ProtectedView>
       )
     }
@@ -77,7 +154,7 @@ function App() {
 
   return (
     <AppShell user={session.user} onLogout={handleLogout}>
-      <Layout user={session.user} view={view} onNavigate={setView}>
+      <Layout user={session.user} view={view} onNavigate={handleNavigate}>
         {renderView()}
       </Layout>
     </AppShell>

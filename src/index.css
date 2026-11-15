@@ -72,3 +72,34 @@ button:focus {
     flex-wrap: wrap;
   }
 }
+
+.card {
+  width: 100%;
+  text-align: left;
+}
+
+.card.active {
+  background: #1a3a5c;
+  color: white;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panel {
+  border: 1px solid #ccc;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 360px;
+}
