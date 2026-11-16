@@ -1,11 +1,15 @@
 import { useState } from "react"
-import { login, getDrivers, createDriver, suspendDriver, activateDriver } from "./api"
+import {
+  login, getDrivers, createDriver, suspendDriver, activateDriver,
+  getTrucks, createTruck, updateTruck, archiveTruck,
+} from "./api"
 import LoginForm from "./components/LoginForm"
 import AppShell from "./components/AppShell"
 import AdminLayout from "./components/AdminLayout"
 import DriverLayout from "./components/DriverLayout"
 import ProtectedView from "./components/ProtectedView"
 import UsersPage from "./components/UsersPage"
+import TrucksPage from "./components/TrucksPage"
 
 function App() {
   const [session, setSession] = useState(null)
@@ -18,6 +22,14 @@ function App() {
   const [usersError, setUsersError] = useState("")
   const [selectedUserId, setSelectedUserId] = useState(null)
   const [formError, setFormError] = useState("")
+
+
+  const [trucks, setTrucks] = useState([])
+  const [trucksLoading, setTrucksLoading] = useState(false)
+  const [trucksError, setTrucksError] = useState("")
+  const [selectedTruckId, setSelectedTruckId] = useState(null)
+  const [editingTruck, setEditingTruck] = useState(null)
+  const [truckFormError, setTruckFormError] = useState("")
 
   async function handleLogin(email, password) {
     setLoginLoading(true)
@@ -42,6 +54,11 @@ function App() {
     setSelectedUserId(null)
     setUsersError("")
     setFormError("")
+    setTrucks([])
+    setSelectedTruckId(null)
+    setEditingTruck(null)
+    setTrucksError("")
+    setTruckFormError("")
   }
 
   function handleApiError(error, showMessage) {
@@ -69,10 +86,23 @@ function App() {
     }
   }
 
+  async function loadTrucks() {
+    setTrucksLoading(true)
+    setTrucksError("")
+    try {
+      setTrucks(await getTrucks(session.token))
+    } catch (error) {
+      handleApiError(error, setTrucksError)
+    } finally {
+      setTrucksLoading(false)
+    }
+  }
+
   function handleNavigate(newView) {
     setView(newView)
-    if (newView === "users" && session.user.role === "admin") {
-      loadUsers()
+    if (session.user.role === "admin") {
+      if (newView === "users") loadUsers()
+      if (newView === "trucks") loadTrucks()
     }
   }
 
@@ -102,6 +132,44 @@ function App() {
     }
   }
 
+ 
+  function handleEditTruck(truck) {
+    setTruckFormError("")
+    setEditingTruck(truck)
+  }
+
+  function handleCancelEdit() {
+    setTruckFormError("")
+    setEditingTruck(null)
+  }
+
+  async function handleSaveTruck(data) {
+    setTruckFormError("")
+    try {
+      if (editingTruck) {
+        await updateTruck(session.token, editingTruck._id, data)
+      } else {
+        await createTruck(session.token, data)
+      }
+      await loadTrucks()
+      setEditingTruck(null)
+      return true
+    } catch (error) {
+      handleApiError(error, setTruckFormError)
+      return false
+    }
+  }
+
+  async function handleArchiveTruck(truck) {
+    setTrucksError("")
+    try {
+      await archiveTruck(session.token, truck._id)
+      await loadTrucks()
+    } catch (error) {
+      handleApiError(error, setTrucksError)
+    }
+  }
+
   if (!session) {
     return <LoginForm onLogin={handleLogin} loading={loginLoading} error={loginError} />
   }
@@ -126,8 +194,19 @@ function App() {
     if (view === "trucks") {
       return (
         <ProtectedView session={session} allowedRoles={["admin"]}>
-          <h2>Camions</h2>
-          <p>La liste arrive à l'étape F.</p>
+          <TrucksPage
+            trucks={trucks}
+            loading={trucksLoading}
+            error={trucksError}
+            selectedId={selectedTruckId}
+            onSelect={setSelectedTruckId}
+            editingTruck={editingTruck}
+            onEdit={handleEditTruck}
+            onCancelEdit={handleCancelEdit}
+            onSave={handleSaveTruck}
+            onArchive={handleArchiveTruck}
+            formError={truckFormError}
+          />
         </ProtectedView>
       )
     }

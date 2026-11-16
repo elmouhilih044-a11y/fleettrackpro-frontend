@@ -52,3 +52,19 @@ export function suspendDriver(token, id) {
 export function activateDriver(token, id) {
   return request(`/users/drivers/${id}/activate`, { method: "PUT", token })
 }
+
+export function getTrucks(token) {
+  return request("/trucks", { token })
+}
+
+export function createTruck(token, truck) {
+  return request("/trucks", { method: "POST", body: truck, token })
+}
+
+export function updateTruck(token, id, truck) {
+  return request(`/trucks/${id}`, { method: "PUT", body: truck, token })
+}
+
+export function archiveTruck(token, id) {
+  return request(`/trucks/${id}`, { method: "DELETE", token })
+}
