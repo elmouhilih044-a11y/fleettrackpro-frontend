@@ -108,3 +108,20 @@ button:focus {
   display: flex;
   gap: 8px;
 }
+
+.menu a {
+  padding: 8px;
+  border: 1px solid #1a3a5c;
+  border-radius: 4px;
+  color: #1a3a5c;
+  text-decoration: none;
+}
+
+.menu a.active {
+  background: #1a3a5c;
+  color: white;
+}
+
+.menu a:focus {
+  outline: 3px solid #1a73e8;
+}
