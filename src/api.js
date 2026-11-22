@@ -78,6 +78,22 @@ export function archiveTruck(token, id) {
   return request(`/trucks/${id}`, { method: "DELETE", token })
 }
 
+export function createTrailer(token, trailer) {
+  return request("/trailers", { method: "POST", body: trailer, token })
+}
+
+export function updateTrailer(token, id, trailer) {
+  return request(`/trailers/${id}`, { method: "PUT", body: trailer, token })
+}
+
+export function archiveTrailer(token, id) {
+  return request(`/trailers/${id}`, { method: "DELETE", token })
+}
+
+export function createTrip(token, trip) {
+  return request("/trips", { method: "POST", body: trip, token })
+}
+
 export function updateMyTripStatus(token, id, status) {
   return request(`/my-trips/${id}/status`, { method: "PUT", body: { status }, token })
 }
