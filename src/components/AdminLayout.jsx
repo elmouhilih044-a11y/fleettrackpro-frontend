@@ -6,6 +6,8 @@ function AdminLayout({ user, onLogout }) {
     { to: "/admin", label: "Accueil", end: true },
     { to: "/admin/utilisateurs", label: "Utilisateurs" },
     { to: "/admin/camions", label: "Camions" },
+    { to: "/admin/remorques", label: "Remorques" },
+    { to: "/admin/trajets", label: "Trajets" },
   ]
 
   return (

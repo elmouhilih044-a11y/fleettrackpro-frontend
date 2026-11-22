@@ -8,6 +8,12 @@ import DriverLayout from "./components/DriverLayout"
 import HomePage from "./components/HomePage"
 import UsersPage from "./components/UsersPage"
 import TrucksPage from "./components/TrucksPage"
+import TrailersListPage from "./components/TrailersListPage"
+import TrailerFormPage from "./components/TrailerFormPage"
+import TrailerDetailPage from "./components/TrailerDetailPage"
+import TripsListPage from "./components/TripsListPage"
+import TripFormPage from "./components/TripFormPage"
+import TripDetailPage from "./components/TripDetailPage"
 import MyTripsPage from "./components/MyTripsPage"
 import MyTripDetailPage from "./components/MyTripDetailPage"
 import ForbiddenPage from "./components/ForbiddenPage"
@@ -35,6 +41,12 @@ function AppRoutes({ session, onLogin, onLogout, loginLoading, loginError }) {
             <Route index element={<HomePage user={user} />} />
             <Route path="utilisateurs" element={<UsersPage token={token} />} />
             <Route path="camions" element={<TrucksPage token={token} />} />
+            <Route path="remorques" element={<TrailersListPage token={token} />} />
+            <Route path="remorques/nouveau" element={<TrailerFormPage token={token} />} />
+            <Route path="remorques/:id" element={<TrailerDetailPage token={token} />} />
+            <Route path="trajets" element={<TripsListPage token={token} />} />
+            <Route path="trajets/nouveau" element={<TripFormPage token={token} />} />
+            <Route path="trajets/:id" element={<TripDetailPage token={token} />} />
           </Route>
         </Route>
 
