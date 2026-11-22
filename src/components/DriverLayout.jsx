@@ -1,25 +1,27 @@
-function DriverLayout({ user, view, onNavigate, children }) {
+import { NavLink, Outlet } from "react-router-dom"
+import AppShell from "./AppShell"
+
+function DriverLayout({ user, onLogout }) {
   const items = [
-    { id: "home", label: "Accueil" },
-    { id: "trips", label: "Mes trajets" },
+    { to: "/chauffeur", label: "Accueil", end: true },
+    { to: "/chauffeur/trajets", label: "Mes trajets" },
   ]
 
   return (
-    <div className="layout">
-      <nav className="menu" aria-label={`Menu de ${user.firstName}`}>
-        {items.map((item) => (
-          <button
-            key={item.id}
-            className={view === item.id ? "active" : ""}
-            aria-current={view === item.id ? "page" : undefined}
-            onClick={() => onNavigate(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
-      <section className="content">{children}</section>
-    </div>
+    <AppShell user={user} onLogout={onLogout}>
+      <div className="layout">
+        <nav className="menu" aria-label="Menu chauffeur">
+          {items.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end}>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <section className="content">
+          <Outlet />
+        </section>
+      </div>
+    </AppShell>
   )
 }
 

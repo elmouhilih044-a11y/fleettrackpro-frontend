@@ -1,26 +1,28 @@
-function AdminLayout({ view, onNavigate, children }) {
+import { NavLink, Outlet } from "react-router-dom"
+import AppShell from "./AppShell"
+
+function AdminLayout({ user, onLogout }) {
   const items = [
-    { id: "home", label: "Accueil" },
-    { id: "users", label: "Utilisateurs" },
-    { id: "trucks", label: "Camions" },
+    { to: "/admin", label: "Accueil", end: true },
+    { to: "/admin/utilisateurs", label: "Utilisateurs" },
+    { to: "/admin/camions", label: "Camions" },
   ]
 
   return (
-    <div className="layout">
-      <nav className="menu" aria-label="Menu administrateur">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            className={view === item.id ? "active" : ""}
-            aria-current={view === item.id ? "page" : undefined}
-            onClick={() => onNavigate(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
-      <section className="content">{children}</section>
-    </div>
+    <AppShell user={user} onLogout={onLogout}>
+      <div className="layout">
+        <nav className="menu" aria-label="Menu administrateur">
+          {items.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end}>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <section className="content">
+          <Outlet />
+        </section>
+      </div>
+    </AppShell>
   )
 }
 
