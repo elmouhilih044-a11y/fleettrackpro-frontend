@@ -9,8 +9,10 @@ export function useApiGet(path, token) {
 
   useEffect(() => {
     const controller = new AbortController()
+    /* eslint-disable react-hooks/set-state-in-effect -- schéma de lecture imposé par le brief */
     setStatus("loading")
     setError(null)
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     request(path, { token, signal: controller.signal })
       .then((result) => {

@@ -31,7 +31,7 @@ export async function request(path, { method = "GET", body, token, signal } = {}
     throw error
   }
 
-  let data = null
+  let data
   try {
     data = await response.json()
   } catch (caught) {
